@@ -81,6 +81,24 @@ func parity(x uint16) uint16 {
 	return 1
 }
 
+// Entropy is the entropy of the byte array
+func Entropy(in []byte) float64 {
+	histogram := make([]int, 256)
+	for k := range in {
+		histogram[in[k]]++
+	}
+	entropy := 0.0
+	for _, v := range histogram {
+		if v == 0 {
+			continue
+		}
+		p := float64(v) / float64(len(in))
+		entropy += p * math.Log2(p)
+	}
+	entropy = -entropy
+	return entropy
+}
+
 func main() {
 	file, err := Data.Open("data/AMillionRandomDigits.bin")
 	if err != nil {
@@ -91,11 +109,13 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	initial := Entropy(data[:1024])
+	fmt.Println("Entropy(data)", initial)
 	min := math.MaxFloat64
 	for i := 0; i < math.MaxUint16; i++ {
 		mask := uint16(0x8000 | i)
 		for j := 0; j < math.MaxUint16; j++ {
-			lfsr, output := uint16(j), make([]byte, 1024)
+			lfsr, output := uint16(1), make([]byte, 1024)
 			for k := range output {
 				var t byte
 				for l := 0; l < 8; l++ {
@@ -104,18 +124,9 @@ func main() {
 				}
 				output[k] = data[k] ^ t
 			}
-			histogram := make([]int, 256)
-			for k := range output {
-				histogram[output[k]]++
-			}
-			entropy := 0.0
-			for _, v := range histogram {
-				p := float64(v) / float64(len(output))
-				entropy += p * math.Log2(p)
-			}
-			entropy = -entropy
+			entropy := Entropy(output[:1024])
 			if entropy < min {
-				fmt.Println(entropy)
+				fmt.Println(entropy, (initial-entropy)*1024)
 				min = entropy
 			}
 		}
