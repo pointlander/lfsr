@@ -5,7 +5,9 @@
 package main
 
 import (
+	"embed"
 	"fmt"
+	"io"
 	"sort"
 
 	"gonum.org/v1/plot"
@@ -13,10 +15,24 @@ import (
 	"gonum.org/v1/plot/vg"
 )
 
+//go:embed data/*
+var Data embed.FS
+
 // LFSRMask is a LFSR mask with a maximum period
 const LFSRMask = 0x80000057
 
 func main() {
+	file, err := Data.Open("data/AMillionRandomDigits.bin")
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+	data, err := io.ReadAll(file)
+	if err != nil {
+		panic(err)
+	}
+	_ = data
+
 	type Bucket struct {
 		Index int
 		Count int
