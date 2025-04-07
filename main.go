@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"math"
+	"math/bits"
 	"sort"
 
 	"gonum.org/v1/plot"
@@ -69,12 +70,7 @@ func Histogram() {
 }
 
 func parity(x uint16) uint16 {
-	count := 0
-	for i := 0; i < 16; i++ {
-		if (x>>i)&1 == 1 {
-			count++
-		}
-	}
+	count := bits.OnesCount16(x)
 	if count%2 == 0 {
 		return 0
 	}
