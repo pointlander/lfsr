@@ -102,6 +102,8 @@ func Entropy(in []byte) float64 {
 var (
 	// FlagFetch fetchs the quantum data
 	FlagFetch = flag.Bool("fetch", false, "fetch the quantum data")
+	// FlagData is the data to use
+	FlagData = flag.String("data", "data/AMillionRandomDigits.bin", "the data to use")
 )
 
 func main() {
@@ -148,7 +150,7 @@ func main() {
 		return
 	}
 
-	file, err := Data.Open("data/AMillionRandomDigits.bin")
+	file, err := Data.Open(*FlagData)
 	if err != nil {
 		panic(err)
 	}
