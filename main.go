@@ -6,10 +6,14 @@ package main
 
 import (
 	"embed"
+	"flag"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"math"
 	"math/bits"
+	"net/http"
+	"os"
 	"sort"
 
 	"gonum.org/v1/plot"
@@ -95,7 +99,54 @@ func Entropy(in []byte) float64 {
 	return entropy
 }
 
+var (
+	// FlagFetch fetchs the quantum data
+	FlagFetch = flag.Bool("fetch", false, "fetch the quantum data")
+)
+
 func main() {
+	flag.Parse()
+
+	if *FlagFetch {
+		var quantum []byte
+		for len(quantum) < 8*1024 {
+			resp, err := http.Get("https://qrng.anu.edu.au/wp-content/plugins/colours-plugin/get_block_binary.php")
+			if err != nil {
+				panic(err)
+			}
+			defer resp.Body.Close()
+
+			body, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				panic(err)
+			}
+			quantum = append(quantum, body...)
+			fmt.Println(len(quantum))
+		}
+		data := make([]byte, 0, 1024)
+		b := byte(0)
+		for i, v := range quantum {
+			if i%8 == 0 {
+				data = append(data, b)
+				b = 0
+			}
+			b <<= 1
+			if v == '1' {
+				b |= 1
+			}
+		}
+		out, err := os.Create("data/quantum.bin")
+		if err != nil {
+			panic(err)
+		}
+		defer out.Close()
+		_, err = out.Write(data)
+		if err != nil {
+			panic(err)
+		}
+		return
+	}
+
 	file, err := Data.Open("data/AMillionRandomDigits.bin")
 	if err != nil {
 		panic(err)
