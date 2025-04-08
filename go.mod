@@ -3,6 +3,11 @@ module github.com/pointlander/lfsr
 go 1.24.1
 
 require (
+	github.com/pointlander/compress v1.1.1-0.20250321181703-4627735067bb
+	gonum.org/v1/plot v0.16.0
+)
+
+require (
 	codeberg.org/go-fonts/liberation v0.5.0 // indirect
 	codeberg.org/go-latex/latex v0.1.0 // indirect
 	codeberg.org/go-pdf/fpdf v0.10.0 // indirect
@@ -13,5 +18,4 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	golang.org/x/image v0.25.0 // indirect
 	golang.org/x/text v0.23.0 // indirect
-	gonum.org/v1/plot v0.16.0 // indirect
 )

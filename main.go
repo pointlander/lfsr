@@ -5,6 +5,7 @@
 package main
 
 import (
+	"bytes"
 	"embed"
 	"flag"
 	"fmt"
@@ -19,6 +20,8 @@ import (
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
 	"gonum.org/v1/plot/vg"
+
+	"github.com/pointlander/compress"
 )
 
 //go:embed data/*
@@ -176,7 +179,9 @@ func main() {
 			}
 			entropy := Entropy(output[:1024])
 			if entropy < min {
-				fmt.Println(entropy, (initial-entropy)*1024)
+				buffer := bytes.Buffer{}
+				compress.Mark1Compress1(output, &buffer)
+				fmt.Println(entropy, (initial-entropy)*1024, buffer.Len()-1024)
 				min = entropy
 			}
 		}
