@@ -126,7 +126,7 @@ func main() {
 		data := make([]byte, 0, 1024)
 		b := byte(0)
 		for i, v := range quantum {
-			if i%8 == 0 {
+			if i != 0 && i%8 == 0 {
 				data = append(data, b)
 				b = 0
 			}
@@ -135,6 +135,7 @@ func main() {
 				b |= 1
 			}
 		}
+		data = append(data, b)
 		out, err := os.Create("data/quantum.bin")
 		if err != nil {
 			panic(err)
